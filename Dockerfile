@@ -3,7 +3,7 @@
 FROM ruby:2.5.3
 LABEL maintainer="pierre.courbin@gmail.com"
 
-ARG decidim_version
+ARG decidim_version=0.20.0
 
 ENV DECIDIM_PATH /app
 ENV LANG C.UTF-8
