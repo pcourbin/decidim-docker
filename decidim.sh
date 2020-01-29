@@ -1,5 +1,11 @@
 #!/bin/bash
+#https://stackoverflow.com/questions/37836764/run-command-in-docker-container-only-on-the-first-start
 set -e
+if [ -z "$RAILS_ENV" ]; then
+  RAILS_ENV_TEMP="production"
+else
+  RAILS_ENV_TEMP=$RAILS_ENV
+fi
 
 # DECIDIM_PATH is defined by an ENV command in the backing Dockerfile
 decidim_init_file=${DECIDIM_PATH}/config/initializers/decidim.rb
@@ -10,7 +16,18 @@ admin_email=${ADMIN_EMAIL}
 admin_password=${ADMIN_PASSWORD}
 
 function db_create() {
-  rails db:create db:migrate #db:seed
+  if [[ "$RAILS_ENV_TEMP" == "production" ]]; then
+      echo "**************************************"
+      echo "********** ENV_PRODUCTION ************"
+      echo "**************************************"
+      rails db:create db:migrate RAILS_ENV=production
+      rails assets:precompile db:migrate RAILS_ENV=production
+  else
+      echo "**************************************"
+      echo "********* ENV_DEVELOPEMENT ***********"
+      echo "**************************************"
+      rails db:create db:migrate #db:seed
+  fi
 }
 
 function db_create_admin() {
@@ -54,50 +71,59 @@ function default_locales_available() {
 tail -F ${DECIDIM_PATH}/log/development.log &
 tail -F ${DECIDIM_PATH}/log/production.log &
 
-if [[ "$DB_CREATE" == "true" ]]; then
-    echo "**************************************"
-    echo "************* DB_CREATE **************"
-    echo "**************************************"
-    db_create
-fi
+CONTAINER_ALREADY_STARTED="CONTAINER_ALREADY_STARTED_PLACEHOLDER"
+if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
+    touch $CONTAINER_ALREADY_STARTED
+    echo "-- First container startup --"
 
-if [[ "$DB_SEED_DATA" == "true" ]]; then
-    echo "**************************************"
-    echo "************ DB_SEED_DAT *************"
-    echo "**************************************"
-    seed_data
-fi
+    if [[ "$DB_CREATE" == "true" ]]; then
+        echo "**************************************"
+        echo "************* DB_CREATE **************"
+        echo "**************************************"
+        db_create
+    fi
 
-if [[ "$ADMIN_ENABLE" == "true" ]]; then
-    echo "**************************************"
-    echo "*********** ADMIN_ENABLE *************"
-    echo "**************************************"
-    db_create_admin
-fi
+    if [[ "$DB_SEED_DATA" == "true" ]]; then
+        echo "**************************************"
+        echo "************ DB_SEED_DAT *************"
+        echo "**************************************"
+        seed_data
+    fi
 
-if [[ "$DECIDIM_UPDATE" == "true" ]]; then
-    echo "**************************************"
-    echo "********** DECIDIM_UPDATE ************"
-    echo "**************************************"
-    update
-fi
+    if [[ "$ADMIN_ENABLE" == "true" ]]; then
+        echo "**************************************"
+        echo "*********** ADMIN_ENABLE *************"
+        echo "**************************************"
+        db_create_admin
+    fi
 
-if [[ -z "${DEFAULT_LOCALE}" ]]; then
-    echo "No DEFAULT_LOCALE"
+    if [[ "$DECIDIM_UPDATE" == "true" ]]; then
+        echo "**************************************"
+        echo "********** DECIDIM_UPDATE ************"
+        echo "**************************************"
+        update
+    fi
+
+    if [[ -z "${DEFAULT_LOCALE}" ]]; then
+        echo "No DEFAULT_LOCALE"
+    else
+        echo "**************************************"
+        echo "********** DEFAULT_LOCALE ************"
+        echo "**************************************"
+        default_locale
+    fi
+
+    if [[ -z "${DEFAULT_LOCALES_AVAILABLE}" ]]; then
+        echo "No DEFAULT_LOCALES_AVAILABLE"
+    else
+        echo "**************************************"
+        echo "***** DEFAULT_LOCALES_AVAILABLE ******"
+        echo "**************************************"
+        default_locales_available
+    fi
+
 else
-    echo "**************************************"
-    echo "********** DEFAULT_LOCALE ************"
-    echo "**************************************"
-    default_locale
-fi
-
-if [[ -z "${DEFAULT_LOCALES_AVAILABLE}" ]]; then
-    echo "No DEFAULT_LOCALES_AVAILABLE"
-else
-    echo "**************************************"
-    echo "***** DEFAULT_LOCALES_AVAILABLE ******"
-    echo "**************************************"
-    default_locales_available
+    echo "-- Not first container startup. Delete file \"CONTAINER_ALREADY_STARTED_PLACEHOLDER\" if you want to run the initialization process. --"
 fi
 
 if [ "$1" = "db_create" ]; then
