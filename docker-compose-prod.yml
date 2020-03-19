@@ -14,21 +14,25 @@ services:
     environment:
       - PORT=3000
       - DATABASE_URL=postgres://decidim:pgpassword@pg/app_development
-      - DATABASE_HOST=pg
-      - DATABASE_USERNAME=decidim
-      - DATABASE_PASSWORD=pgpassword
-      - RAILS_ENV=development
-#      - RAILS_ENV=production
+      - RAILS_SERVE_STATIC_FILES=true # Si en RAILS_ENV=production et que vous n'avez pas de NGINX devant
+      - RAILS_ENV=production
       - DB_CREATE=true
       - ADMIN_ENABLE=true
       - ADMIN_EMAIL=admin@mydecidim.org
       - ADMIN_PASSWORD=myadminpassword
       - DEFAULT_LOCALE=fr
       - 'DEFAULT_LOCALES_AVAILABLE=[:fr,:en,:es,:de,:it]'
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY_BASE=a757e13264523ec2d6858b5183432abb14eefa48a61292108f227a9f1412633921edc7d86e6384a487994e9831fa6fcb16a4f29d51d5e0e73f387503f1b052f9
+      - SMTP_USERNAME=pcourbin.dev@gmail.com
+      - SMTP_PASSWORD=rmkydygeqmyidqee
+      - SMTP_ADDRESS=smtp.gmail.com
+      - SMTP_DOMAIN=gmail.com
     ports:
       - 3000:3000
     links:
       - pg
+      - redis
   pg:
     image: postgres
     environment:
@@ -37,7 +41,12 @@ services:
 
 #    volumes:
 #      - pg-data:/var/lib/postgresql/data
+  redis:
+    image: redis
+    volumes:
+      - redis-data:/data
 volumes:
   node_modules: {}
   bundle: {}
   pg-data: {}
+  redis-data: {}

@@ -1,0 +1,46 @@
+version: '3'
+services:
+  app:
+    image: pcourbin/decidim:0.20.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        decidim_version: 0.20.0
+#    volumes:
+#      - .:/code
+#      - bundle:/usr/local/bundle
+#      - node_modules:/code/node_modules
+    environment:
+      - PORT=3000
+      - DATABASE_HOST=pg
+      - DATABASE_USERNAME=decidim
+      - DATABASE_PASSWORD=pgpassword
+      - RAILS_ENV=development
+      - DB_CREATE=true
+      - ADMIN_ENABLE=true
+      - ADMIN_EMAIL=admin@mydecidim.org
+      - ADMIN_PASSWORD=myadminpassword
+      - DEFAULT_LOCALE=fr
+      - 'DEFAULT_LOCALES_AVAILABLE=[:fr,:en,:es,:de,:it]'
+      - SECRET_KEY_BASE=a757e13264523ec2d6858b5183432abb14eefa48a61292108f227a9f1412633921edc7d86e6384a487994e9831fa6fcb16a4f29d51d5e0e73f387503f1b052f9
+      - SMTP_USERNAME=pcourbin.dev@gmail.com
+      - SMTP_PASSWORD=rmkydygeqmyidqee
+      - SMTP_ADDRESS=smtp.gmail.com
+      - SMTP_DOMAIN=gmail.com
+    ports:
+      - 3000:3000
+    links:
+      - pg
+  pg:
+    image: postgres
+    environment:
+      - POSTGRES_USER=decidim
+      - POSTGRES_PASSWORD=pgpassword
+#    volumes:
+#      - pg-data:/var/lib/postgresql/data
+
+volumes:
+  node_modules: {}
+  bundle: {}
+  pg-data: {}
