@@ -2,24 +2,14 @@ version: '3'
 services:
   app:
     image: pcourbin/decidim:0.20.0
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        decidim_version: 0.20.0
-#    volumes:
-#      - .:/code
-#      - bundle:/usr/local/bundle
-#      - node_modules:/code/node_modules
     environment:
       - DATABASE_HOST=pg
       - DATABASE_USERNAME=decidim
       - DATABASE_PASSWORD=pgpassword
+      #- DATABASE_URL=postgres://decidim:pgpassword@pg/app_development
       - RAILS_ENV=development
       - DB_CREATE=true
       - DB_SEED_DATA=true
-      - DEFAULT_LOCALE=en
-      - 'DEFAULT_LOCALES_AVAILABLE=[:en,:fr,:es,:de,:it,:ca]'
     ports:
       - 3000:3000
     links:
@@ -30,10 +20,3 @@ services:
     environment:
       - POSTGRES_USER=decidim
       - POSTGRES_PASSWORD=pgpassword
-#    volumes:
-#      - pg-data:/var/lib/postgresql/data
-
-volumes:
-  node_modules: {}
-  bundle: {}
-  pg-data: {}

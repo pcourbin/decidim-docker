@@ -1,6 +1,4 @@
-# can't update to a higher Ruby version because they use debian 10
-# and wkhtmltopdf-binary in decidim-initiatives still not supports debian 10
-FROM ruby:2.5.3
+FROM ruby:2.6.5
 LABEL maintainer="pierre.courbin@gmail.com"
 
 ARG decidim_version=0.20.0
@@ -14,11 +12,11 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - \
   && apt-get install -y nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && npm install -g npm@6.3.0
+  && npm install -g npm@6.14.3
 
 RUN gem install decidim:$decidim_version
 WORKDIR /

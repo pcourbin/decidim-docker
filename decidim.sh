@@ -20,8 +20,8 @@ function db_create() {
       echo "**************************************"
       echo "********** ENV_PRODUCTION ************"
       echo "**************************************"
-      rails db:create db:migrate RAILS_ENV=production
-      rails assets:precompile db:migrate RAILS_ENV=production
+      RAILS_ENV=production rails db:create db:migrate
+      RAILS_ENV=production rails assets:precompile db:migrate
   else
       echo "**************************************"
       echo "********* ENV_DEVELOPEMENT ***********"
@@ -31,9 +31,6 @@ function db_create() {
 }
 
 function db_create_admin() {
-  #rails runner "
-  #  user = Decidim::System::Admin.new(email: '${admin_email}', password: '${admin_password}', password_confirmation: '${admin_password}')
-  #  user.try(:save!)"
   rails runner "
   begin
     Decidim::System::Admin.create!(
