@@ -3,23 +3,25 @@ services:
   app:
     image: pcourbin/decidim:0.21.0
     environment:
-      - DATABASE_URL=postgres://decidim:pgpassword@pg/app_production
+      - DATABASE_URL=postgres://decidim:OCkeTrIACTIsAusiUMbo@pg/app_production
       - RAILS_SERVE_STATIC_FILES=true # If RAILS_ENV=production and you don't have NGINX before requests
       - RAILS_ENV=production
       - DB_CREATE=true
       - ADMIN_ENABLE=true
-      - ADMIN_EMAIL=admin@mydecidim.org
-      - ADMIN_PASSWORD=myadminpassword
+      - ADMIN_EMAIL=pierre.courbin@gmail.com
+      - ADMIN_PASSWORD=temppassword
       - DEFAULT_LOCALE=en
       - 'DEFAULT_LOCALES_AVAILABLE=[:en,:fr,:es,:de,:it,:ca]'
       - REDIS_URL=redis://redis:6379
-      - SECRET_KEY_BASE=my_secret_key_base
-      - SMTP_USERNAME=mymail@gmail.com
-      - SMTP_PASSWORD=mypassword
+      - SECRET_KEY_BASE=ZQvTaHbSV3QUbFZBcfsrre9jEzucc29e2bfKWnFDPwqKgcQKRYGgHcDUx5jWrTNjVhbtWK
+      - SMTP_USERNAME=pcourbin.dev@gmail.com
+      - SMTP_PASSWORD=dohodkuoxxqeycat
       - SMTP_ADDRESS=smtp.gmail.com
       - SMTP_DOMAIN=gmail.com
+    volumes:
+      - ./decidim-data:/app/public/uploads
     ports:
-      - 3000:3000
+      - 8030:3000
     links:
       - pg
       - redis
@@ -29,17 +31,13 @@ services:
     image: postgres
     environment:
       - POSTGRES_USER=decidim
-      - POSTGRES_PASSWORD=pgpassword
+      - POSTGRES_PASSWORD=OCkeTrIACTIsAusiUMbo
     volumes:
-      - pg-data:/var/lib/postgresql/data
+      - ./pg-data:/var/lib/postgresql/data
     restart: always
 
   redis:
     image: redis
     volumes:
-      - redis-data:/data
+      - ./redis-data:/data
     restart: always
-
-volumes:
-  pg-data: {}
-  redis-data: {}

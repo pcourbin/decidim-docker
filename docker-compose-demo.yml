@@ -1,7 +1,7 @@
 version: '3'
 services:
   app:
-    image: pcourbin/decidim:0.20.0
+    image: pcourbin/decidim:0.21.0
     environment:
       - DATABASE_HOST=pg
       - DATABASE_USERNAME=decidim

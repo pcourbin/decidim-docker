@@ -1,12 +1,12 @@
 version: '3'
 services:
   app:
-    image: pcourbin/decidim:0.20.0
+    image: pcourbin/decidim:0.21.0
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        decidim_version: 0.20.0
+        decidim_version: 0.21.0
 #    volumes:
 #      - .:/code
 #      - bundle:/usr/local/bundle
